@@ -1,17 +1,17 @@
 package org.extractor.main;
 
-import java.awt.List;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
+import org.gdal.gdal.gdal;
+import org.gdal.gdal.Band;
+import org.gdal.gdal.Dataset;
 import mil.nga.tiff.*;
 
 /**
@@ -22,9 +22,22 @@ public class App
 {
     public static void main( String[] args ) throws IOException
     {
+    	openTiffViaNga();
+    	  
+    }
+    
+    
+    public static void openTiffViaGdal() {
     	
-    	//File file = new File("world/wc2.0_10m_tavg_01.tif");
-    	File file = new File("world/rendermap.tiff");
+    	
+    	Dataset dataset = gdal.Open("world/wc2.0_10m_tavg_01.tif");
+    	Band band = dataset.GetRasterBand(1);
+    }
+    
+    public static void openTiffViaNga() throws IOException {
+    	
+    	File file = new File("world/wc2.0_10m_tavg_01.tif");
+    	//File file = new File("world/rendermap.tiff");
         
         TIFFImage tiffImage = TiffReader.readTiff(file);
         
@@ -32,8 +45,23 @@ public class App
         Rasters rasters = fileDirectory.readRasters();         
         ByteBuffer byteBuffer = rasters.getSampleValues()[0];        
         Set<Float> values = new HashSet<>();
+        float coors[][] = new float[rasters.getWidth()][rasters.getHeight()];
+        System.out.println(rasters.getPixel(2159, 1079)[0]);
+        
+        for(int i = 0; i < rasters.getWidth(); i++) {
+        	for(int j = 0; j < rasters.getHeight(); j++) {      
+        		
+        		coors[i][j] = rasters.getPixel(i, j)[0].floatValue();     		
+        		
+        	}
+        	
+        } 
+        System.out.println(rasters.getInterleaveIndex(1049, 223));
         
         
+        //http://duff.ess.washington.edu/data/raster/drg/docs/geotiff.txt
+        //tiepoint je na -180 long a 90 lat
+        /*
         byteBuffer.rewind(); 
         while (byteBuffer.hasRemaining())
         {
@@ -48,28 +76,26 @@ public class App
         
         
         System.out.println(fileDirectory.getEntries().size());
-        Set<FileDirectoryEntry> fileDirectories = fileDirectory.getEntries();
+        */
         
+        float xScale;
+        float yScale;
+        Set<FileDirectoryEntry> fileDirectories = fileDirectory.getEntries();
         for(FileDirectoryEntry fileE: fileDirectories) {
         	
-        	System.out.println(fileE.getFieldTag().toString());
-        	System.out.println(fileE.getValues().toString());
-        }
+        	if(fileE.getFieldTag().toString().equals("ModelPixelScale")) {
+        		
+        		/*
+        		yScale = ((float[]) fileE.getValues())[1];
+        		System.out.println(xScale);
+        		System.out.println(yScale);
+        		*/
+        		
+        	}        	
+        	
+        } 
         
         
         
-        
-       
-        
-        
-        
-        
-        
-       
-                        
-        
-        
-        
-        
-    }
+    } 
 }
