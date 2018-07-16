@@ -3,30 +3,27 @@ package org.extractor.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.Scanner;
 
-import org.gdal.gdal.gdal;
-import org.gdal.gdal.Band;
-import org.gdal.gdal.Dataset;
+
+
 import mil.nga.tiff.*;
 
 /**
  * Hello world!
- *
+ *https://www.eea.europa.eu/data-and-maps/figures/common-european-chorological-grid-reference-system-cgrs
  */
 public class App 
 {
     public static void main( String[] args ) throws IOException
     {
     	openTiffViaNga();
-    	  
+    	/*
+    	File file = new File("world/cgrs_grid.eps.75dpi.tif");
+    	TIFFImage tiffImage = TiffReader.readTiff(file);        
+        FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);
+        Rasters rasters = fileDirectory.readRasters();  
+        System.out.println(rasters.getPixelSample(0, 500, 500));
+        */
     }
     
     
@@ -72,10 +69,16 @@ public class App
         	}       	
         } 
         
-        System.out.println(GeoMethods.pixelToCoors(1049, 238, xScale, yScale, lonStart, latStart)[0]);
-        System.out.println(GeoMethods.pixelToCoors(1049, 238, xScale, yScale, lonStart, latStart)[1]);
-        System.out.println(GeoMethods.pixelToCoors(1050, 238, xScale, yScale, lonStart, latStart)[0]);
-        System.out.println(GeoMethods.pixelToCoors(1050, 238, xScale, yScale, lonStart, latStart)[1]);
+        double[] loc1Coors = GeoMethods.pixelToCoors(1049, 238, xScale, yScale, lonStart, latStart);
+        double[] loc2Coors = GeoMethods.pixelToCoors(1050, 238, xScale, yScale, lonStart, latStart);
+        Location loc1 = new Location(loc1Coors[0],loc1Coors[1]);
+        Location loc2 = new Location(loc2Coors[0],loc2Coors[1]);
+        System.out.println(loc1);
+        System.out.println(loc2);
+        System.out.println(loc1.distanceTo(loc2));
+        
+        
+        
         
         
     } 
