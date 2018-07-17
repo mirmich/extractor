@@ -3,28 +3,26 @@ package org.extractor.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+
+import mil.nga.tiff.FileDirectory;
+import mil.nga.tiff.FileDirectoryEntry;
+import mil.nga.tiff.Rasters;
+import mil.nga.tiff.TIFFImage;
+import mil.nga.tiff.TiffReader;
 
 
-
-import mil.nga.tiff.*;
-
-/**
- * Hello world!
- *https://www.eea.europa.eu/data-and-maps/figures/common-european-chorological-grid-reference-system-cgrs
- */
 public class App 
 {
     public static void main( String[] args ) throws IOException
     {
-    	openTiffViaNga();
-    	/*
-    	File file = new File("world/cgrs_grid.eps.75dpi.tif");
-    	TIFFImage tiffImage = TiffReader.readTiff(file);        
-        FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);
-        Rasters rasters = fileDirectory.readRasters();  
-        System.out.println(rasters.getPixelSample(0, 500, 500));
-        */
+    	//openTiffViaNga();    	
+    	System.out.println(Arrays.toString(GeoMethods.createCGRSHashMap().get("27WVM3")));
+    	//[[[-22.03984,64.47181],[-22.05719,64.92039],[-21,64.92414],[-21,64.47548],[-22.03984,64.47181]]]
+    	
     }
+    
+    
     
     
     
