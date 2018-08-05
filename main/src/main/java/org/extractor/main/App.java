@@ -1,6 +1,7 @@
 package org.extractor.main;
 
 
+import javafx.scene.shape.Polygon;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,11 +15,16 @@ import mil.nga.tiff.TiffReader;
 
 public class App 
 {
-    public static void main( String[] args ) throws IOException
+    @SuppressWarnings("restriction")
+	public static void main( String[] args ) throws IOException
     {
     	//openTiffViaNga();    	
     	System.out.println(Arrays.toString(GeoMethods.createCGRSHashMap().get("27WVM3")));
     	//[[[-22.03984,64.47181],[-22.05719,64.92039],[-21,64.92414],[-21,64.47548],[-22.03984,64.47181]]]
+    	System.out.println(GeoMethods.distanceGPS(-21.0, -21.0, 64.92414, 64.47548));
+    	openTiffViaNga();
+    	Polygon polygon = new Polygon(0.0, 0.0,20.0, 10.0,10.0, 20.0);
+    	System.out.println(polygon.contains(-21.0, 64));
     	
     }
     
@@ -67,13 +73,14 @@ public class App
         	}       	
         } 
         
-        double[] loc1Coors = GeoMethods.pixelToCoors(1049, 238, xScale, yScale, lonStart, latStart);
-        double[] loc2Coors = GeoMethods.pixelToCoors(1050, 238, xScale, yScale, lonStart, latStart);
+        double[] loc1Coors = GeoMethods.pixelToCoors(1047, 239, xScale, yScale, lonStart, latStart);
+        double[] loc2Coors = GeoMethods.pixelToCoors(1047, 238, xScale, yScale, lonStart, latStart);
         Location loc1 = new Location(loc1Coors[0],loc1Coors[1]);
         Location loc2 = new Location(loc2Coors[0],loc2Coors[1]);
         System.out.println(loc1);
         System.out.println(loc2);
         System.out.println(loc1.distanceTo(loc2));
+        
         
         
         
