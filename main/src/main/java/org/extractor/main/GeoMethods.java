@@ -20,14 +20,7 @@ import org.json.JSONObject;
 public class GeoMethods {
 
 	
-	public static double[] pixelToCoors(int x, int y, double xScale,
-			double yScale, double lonStart, double latStart) {
-		
-			double[] coors = new double[2];
-			coors[0] = lonStart + x * xScale;
-			coors[1] = latStart - y * yScale;			
-			return coors;		
-	}
+	
 	public static double distanceGPS(double lon1, double lon2, double lat1, double lat2) {
 		double distance = 0;
 		double r = 6371e3; // radius of Earth in 
@@ -101,10 +94,10 @@ public class GeoMethods {
         return json;
 	}
 	
-	public static HashMap<String, double[]> createCGRSHashMap() throws JSONException, IOException{
+	public static HashMap<String, Double[]> createCGRSHashMap() throws JSONException, IOException{
 		
 		JSONArray jsonArray = new JSONArray(getCoorsJSON().get("features").toString());
-		HashMap<String,double[]> cgrsCoordinates = new HashMap<>();
+		HashMap<String,Double[]> cgrsCoordinates = new HashMap<>();
 		
 		for(int i = 0; i < jsonArray.length(); i++) {
 			
@@ -115,7 +108,7 @@ public class GeoMethods {
 	    	String[] coorsList = geometry.get("coordinates").toString()
 	    			.replace("[", "").replace("]", "").split(",");
 	    	
-	    	double[] doubleCoors = new double[coorsList.length];
+	    	Double[] doubleCoors = new Double[coorsList.length];
 	    	
 	    	for(int j =0; j < coorsList.length; j++) {
 	    		doubleCoors[j] = Double.parseDouble(coorsList[j]);    		
@@ -126,6 +119,18 @@ public class GeoMethods {
 		}
 		
     	return cgrsCoordinates;
+		
+	}
+	
+	public static Location middleCoorOfPolygon(Double[] polygon) {
+		
+		Double height = polygon[1] + polygon[3];
+		Double width = polygon[0] + polygon[4];
+		
+		return new Location(width/2,height/2);
+		
+		
+		
 		
 	}
 	
