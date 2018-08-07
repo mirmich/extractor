@@ -52,7 +52,8 @@ public class GeoTiff {
         		latStart = Double.valueOf(tiePointCoors[4].trim());
         		
         	}       	
-        }        
+        }
+        
 	}
 	
 	public Location getPxLocation(int x, int y) {
@@ -60,7 +61,7 @@ public class GeoTiff {
         return new Location(loc1Coors[0],loc1Coors[1]);        
 	}
 	
-	public float getPxValue(int x, int y) {		
+	public float getPxValue(int x, int y) {
 		return values[x][y];
 	}
 	
@@ -81,6 +82,37 @@ public class GeoTiff {
 		
 		
 	}
+	
+	public double getAvgFromNeighborhood() 	{return 0;}
+	
+	// returns ale GPS coordinates bound pixel
+	public Double[] getPixelBoundaries(int x, int y) {
+		
+		Double[] boundaries = new Double[8];	
+		int k = 0;
+		Double tempX = new Double(0);
+		Double tempY = new Double(0);
+		
+		for(int i = 0; i <= 1; i++) {
+			for(int j = 0; j <= 1; j++) {
+				Location corner = getPxLocation(x + i, y + j);
+				boundaries[k] = corner.getLongitude();
+				boundaries[k + 1] = corner.getLatitude();
+				k = k + 2;				
+			}			
+		}
+		// make polygon points in counter-clock order
+		tempX = boundaries[4];
+		boundaries[4] = boundaries[6];
+		boundaries[6] = tempX;
+		
+		tempY = boundaries[5];
+		boundaries[5] = boundaries[7];
+		boundaries[7] = tempY;
+		return boundaries;		
+	}
+	
+	
 	
 
 
