@@ -86,12 +86,12 @@ public class GeoTiff {
 	public double getAvgFromNeighborhood() 	{return 0;}
 	
 	// returns ale GPS coordinates bound pixel
-	public Double[] getPixelBoundaries(int x, int y) {
+	public double[] getPixelBoundaries(int x, int y) {
 		
-		Double[] boundaries = new Double[8];	
+		double[] boundaries = new double[10];	
 		int k = 0;
-		Double tempX = new Double(0);
-		Double tempY = new Double(0);
+		double tempX = 0;
+		double tempY = 0;
 		
 		for(int i = 0; i <= 1; i++) {
 			for(int j = 0; j <= 1; j++) {
@@ -102,13 +102,17 @@ public class GeoTiff {
 			}			
 		}
 		// make polygon points in counter-clock order
-		tempX = boundaries[4];
-		boundaries[4] = boundaries[6];
-		boundaries[6] = tempX;
 		
-		tempY = boundaries[5];
-		boundaries[5] = boundaries[7];
-		boundaries[7] = tempY;
+		tempX = boundaries[0];
+		boundaries[0] = boundaries[2];
+		boundaries[2] = tempX;
+		
+		tempY = boundaries[1];
+		boundaries[1] = boundaries[3];
+		boundaries[3] = tempY;
+		boundaries[8] = boundaries[0];
+		boundaries[9] = boundaries[1];
+		
 		return boundaries;		
 	}
 	

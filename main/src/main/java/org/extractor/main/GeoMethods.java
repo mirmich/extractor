@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+
 public class GeoMethods {
 
 	
@@ -94,10 +96,10 @@ public class GeoMethods {
         return json;
 	}
 	
-	public static HashMap<String, Double[]> createCGRSHashMap() throws JSONException, IOException{
+	public static HashMap<String, double[]> createCGRSHashMap() throws JSONException, IOException{
 		
 		JSONArray jsonArray = new JSONArray(getCoorsJSON().get("features").toString());
-		HashMap<String,Double[]> cgrsCoordinates = new HashMap<>();
+		HashMap<String,double[]> cgrsCoordinates = new HashMap<>();
 		
 		for(int i = 0; i < jsonArray.length(); i++) {
 			
@@ -108,7 +110,7 @@ public class GeoMethods {
 	    	String[] coorsList = geometry.get("coordinates").toString()
 	    			.replace("[", "").replace("]", "").split(",");
 	    	
-	    	Double[] doubleCoors = new Double[coorsList.length];
+	    	double[] doubleCoors = new double[coorsList.length];
 	    	
 	    	for(int j =0; j < coorsList.length; j++) {
 	    		doubleCoors[j] = Double.parseDouble(coorsList[j]);    		
@@ -122,14 +124,14 @@ public class GeoMethods {
 		
 	}
 	
-	public static Location middleCoorOfPolygon(Double[] polygon) {
+	public static Location middleCoorOfPolygon(double[] polygon) {
 		
-		Double height = polygon[1] + polygon[3];
-		Double width = polygon[0] + polygon[4];
+		double height = polygon[1] + polygon[3];
+		double width = polygon[0] + polygon[4];
 		
 		return new Location(width/2,height/2);		
 	}
-	public static double getArea(Double[] points) {
+	public static double getArea(double[] points) {
 		double area = 0;
 		
 		for(int i = 0; i < points.length-2; i += 2) {
