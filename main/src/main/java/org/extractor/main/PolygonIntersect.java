@@ -12,6 +12,8 @@ public class PolygonIntersect {
 		double[][] linesReference = getLines(reference);
 		double[][] linesIncident = getLines(incident);
 		
+		
+		
 		return new double[3];
 	}
 	
@@ -53,4 +55,5 @@ public class PolygonIntersect {
  
         return new double[]{x, y};
     }
+	
 }

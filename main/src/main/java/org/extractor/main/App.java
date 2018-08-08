@@ -59,12 +59,13 @@ public class App
     	
     	System.out.println(GeoMethods.getArea(mammalsMap.get("29UPR4")));
     	double[] tstLine = {5, 5, 5,0};
-    	double[] a = {4, 4};
-    	double[] b = {6, 4};
-    	double[] p = {5, 0};
-    	double[] q = {5, 5};
+    	double[] a = {4, 1};
+    	double[] b = {4, 4};
+    	double[] p = {2, 5};
+    	double[] q = {10, 5};
     	System.out.println(PolygonIntersect.isFront(tstLine, a));
     	System.out.println(Arrays.toString(PolygonIntersect.intersection(a, b, p, q)));
+    	
     	
     	
     
