@@ -8,7 +8,7 @@ import java.awt.geom.Area;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-
+import java.util.concurrent.ThreadLocalRandom;
 
 import mil.nga.tiff.FileDirectory;
 import mil.nga.tiff.FileDirectoryEntry;
@@ -67,6 +67,27 @@ public class App
     	System.out.println(GeoMethods.getArea(mammalsMap.get("29UPR4")));
     	 */
     	
+    	int length = 8;
+		double[][] pole = new double[length][length];
+		
+		for(int i = 2; i < length - 2;i++) {
+			for(int j = 2; j <length - 2;j++) {
+				
+				pole[i][j] = ThreadLocalRandom.current().nextInt(1, 9+ 1);
+				
+			}
+		}
+		
+		System.out.println(Arrays.toString(pole[0]));
+		System.out.println(Arrays.toString(pole[1]));
+		System.out.println(Arrays.toString(pole[2]));
+		System.out.println(Arrays.toString(pole[3]));
+		System.out.println(Arrays.toString(pole[4]));
+		System.out.println(Arrays.toString(pole[5]));
+		System.out.println(Arrays.toString(pole[6]));
+		System.out.println(Arrays.toString(pole[7]));
+		
+		
     	
     	
     	
