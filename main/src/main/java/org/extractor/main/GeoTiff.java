@@ -23,18 +23,15 @@ public class GeoTiff {
         TIFFImage tiffImage = TiffReader.readTiff(file);        
         FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);        
         Rasters rasters = fileDirectory.readRasters();        
-        values = new float[rasters.getWidth()][rasters.getHeight()];        
+        values = new float[rasters.getWidth() + 4][rasters.getHeight() + 4];        
         
         for(int i = 0; i < rasters.getWidth(); i++) {
         	for(int j = 0; j < rasters.getHeight(); j++) {      
         		
-        		values[i][j] = rasters.getPixel(i, j)[0].floatValue();     		
+        		values[i+2][j+2] = rasters.getPixel(i, j)[0].floatValue();     		
         		
         	}        	
-        } 
-        
-        
-                
+        }              
         
         for(FileDirectoryEntry fileE: fileDirectory.getEntries()) {
         	
@@ -62,7 +59,7 @@ public class GeoTiff {
 	}
 	
 	public float getPxValue(int x, int y) {
-		return values[x][y];
+		return values[x+2][y+2];
 	}
 	
 	public  double[] pixelToCoors(int x, int y) {
@@ -83,7 +80,12 @@ public class GeoTiff {
 		
 	}
 	
-	public double getAvgFromNeighborhood() 	{return 0;}
+	public double getAvgFromNeighborhood(int x, int y) 	{
+		return 0;
+		
+		
+	
+	}
 	
 	// returns ale GPS coordinates bound pixel
 	public double[] getPixelBoundaries(int x, int y) {

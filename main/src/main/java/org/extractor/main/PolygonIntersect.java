@@ -2,6 +2,7 @@ package org.extractor.main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PolygonIntersect {
@@ -9,27 +10,86 @@ public class PolygonIntersect {
 	
 	public static double[] getIntersect(double[] reference, double[] incident) {
 		
-		double[][] linesReference = getLines(reference);
-		double[][] linesIncident = getLines(incident);
+		List<double[]> linesReference = getLines(reference);
+		List<double[]> linesIncident = getLines(incident);
 		
+		double[] point1 = new double[2];
+		double[] point2 = new double[2];
+		List<double[]> result = new ArrayList<>();
 		
+		for(int i = 0; i < linesReference.size();i++) {	
+			
+			for(int j = 0; j < linesIncident.size();j++) {
+				
+				point1[0] = linesIncident.get(j)[0];
+				point1[1]  = linesIncident.get(j)[1];
+				point2[0]  = linesIncident.get(j)[2];
+				point2[1]  = linesIncident.get(j)[3];
+				if(isFront(linesReference.get(i),point1) && isFront(linesReference.get(i),point2)) {					
+					result.add(new double[] {point2[0], point2[1]});					
+				}else if(isFront(linesReference.get(i),point1) && !isFront(linesReference.get(i),point2)) {
+					result.add(intersection(linesReference.get(i), point1, point2));					
+					
+				}else if(!isFront(linesReference.get(i),point1) && isFront(linesReference.get(i),point2)) {
+					result.add(intersection(linesReference.get(i), point1, point2));
+					result.add(new double[] {point2[0], point2[1]});						
+				}
+				
+			}
+			
+			Collections.rotate(result, 1);			
+			linesIncident = new ArrayList<double[]>(getLines(result));
+			result.clear();		
+		}
 		
-		return new double[3];
+		double[] polygon = new double[linesIncident.size() * 2 + 2];
+		int k = 0;
+		
+		for(double[] e : linesIncident) {
+			
+			polygon[k] = e[0];
+			k++;
+			polygon[k] = e[1];
+			k++;
+		}
+		
+		if(!linesIncident.isEmpty()) {
+			polygon[k] = linesIncident.get(0)[0];
+			k++;
+			polygon[k] = linesIncident.get(0)[1];			
+		}
+		
+		return polygon;
 	}
 	
-	public static double[][] getLines(double[] polygon) {
-		int length = polygon.length/2 - 1;
-		
-		double[][] lines = new double[length][length];
-		int k = 0;		
-		
-		for(int i = 0; i < length; i++) {
-			for(int j = 0; j < length; j++) {
-				lines[i][j] = polygon[k + j];			
-			}
-			k += 2;			
+	
+	public static List<double[]> getLines(double[] polygon) {
+		List<double[]> lines = new ArrayList<>();
+		for(int i = 0; i < polygon.length-2;i+=2) {
+			lines.add(new double[] {polygon[i], polygon[i+1], polygon[i+2], polygon[i+3]});			
 		}
 		return lines;
+	}
+	
+	public static List<double[]> getLines(List<double[]> pointList) {
+		
+		double[] polygon = new double[pointList.size() *2 + 2];
+		int k = 0;
+		
+		for(double[] p : pointList) {
+			polygon[k] = p[0];
+			k++;
+			polygon[k] = p[1];
+			k++;
+		}
+		
+		if(!pointList.isEmpty()) {
+			polygon[k] = pointList.get(0)[0];
+			k++;
+			polygon[k] = pointList.get(0)[1];			
+		}		
+		
+		return getLines(polygon);
 	}
 	
 	public static boolean isFront(double[] line, double[] point) {	
@@ -40,7 +100,9 @@ public class PolygonIntersect {
 		return result >= 0;
 	}
 	
-	public static double[] intersection(double[] a, double[] b, double[] p, double[] q) {
+	public static double[] intersection(double[] line, double[] p, double[] q) {
+		double[] a = new double[] {line[0], line[1]};
+		double[] b = new double[] {line[2], line[3]};		
         double A1 = b[1] - a[1];
         double B1 = a[0] - b[0];
         double C1 = A1 * a[0] + B1 * a[1];
@@ -55,5 +117,7 @@ public class PolygonIntersect {
  
         return new double[]{x, y};
     }
+	
+	
 	
 }

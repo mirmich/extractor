@@ -131,18 +131,14 @@ public class GeoMethods {
 		
 		return new Location(width/2,height/2);		
 	}
+	
 	public static double getArea(double[] points) {
 		double area = 0;
 		
 		for(int i = 0; i < points.length-2; i += 2) {
 			area += (points[i] * points[i + 3]) - (points[i + 1] * points[i + 2]); 
 			
-		}
-		
-		
-		return -(area/2);
-	}
-	
-	
-	
+		}		
+		return Math.abs(area/2);
+	}	
 }
