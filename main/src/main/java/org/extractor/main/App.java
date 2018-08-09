@@ -73,9 +73,19 @@ public class App
 		for(int i = 2; i < length - 2;i++) {
 			for(int j = 2; j <length - 2;j++) {
 				
-				pole[i][j] = ThreadLocalRandom.current().nextInt(1, 9+ 1);
+				pole[i][j] = ThreadLocalRandom.current().nextInt(2, 9+ 1);
 				
 			}
+		}
+		for(int i = 0; i < length;i++) {
+			for(int j = 0; j < length;j++) {
+				if((i > 1 && i < length-2) && (j > 1 && (j < length - 2))) {
+					continue;
+				}
+				pole[i][j] = 1;
+				
+			}
+			
 		}
 		
 		System.out.println(Arrays.toString(pole[0]));
