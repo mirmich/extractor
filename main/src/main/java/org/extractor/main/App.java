@@ -41,6 +41,12 @@ public class App
     	System.out.println(Arrays.toString(middlePixel));
     	System.out.println(avgTempJan.getAvgFromNeighborhood(new int[] {1041,240}, biggerPoly));
     	
+    	// PolyIntersect funguje korektne, podivat se na middle coors a okoli
+    	double[] refPoly = new double[]{1,1,1,5,5,5,5,1,1,1};
+    	double[] incPoly = new double[]{2,2,4,2,4,4,2,4,2,2};
+    	
+    	System.out.println(Arrays.toString(PolygonIntersect.getIntersect(refPoly, incPoly)));
+    	
     	
     	//System.out.println(Arrays.toString(PolygonIntersect.getIntersect(biggerPoly, smallerPoly)));
     	//System.out.println(GeoMethods.getArea((PolygonIntersect.getIntersect(biggerPoly, smallerPoly))));
