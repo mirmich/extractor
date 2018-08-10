@@ -2,12 +2,16 @@ package org.extractor.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import mil.nga.tiff.FileDirectory;
 import mil.nga.tiff.FileDirectoryEntry;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TIFFImage;
 import mil.nga.tiff.TiffReader;
+import java.util.stream.*;
 
 public class GeoTiff {
 	
@@ -15,24 +19,47 @@ public class GeoTiff {
     private double yScale = 0;
     private double lonStart = 0;
     private double latStart = 0;
-    private float[][] values;
+    private double[][] values;
+    
 	
 	public GeoTiff(String path) throws IOException {
 		
 		File file = new File(path);       
         TIFFImage tiffImage = TiffReader.readTiff(file);        
         FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);        
-        Rasters rasters = fileDirectory.readRasters();        
-        values = new float[rasters.getWidth() + 4][rasters.getHeight() + 4];        
+        Rasters rasters = fileDirectory.readRasters();  
+        int width = rasters.getWidth();
+        int height = rasters.getHeight();
+        int widthExt = width + 4;
+        int heightExt = height + 4;
+        values = new double[widthExt][heightExt];  
+        int x = 0;
+        int y = 0;
         
-        for(int i = 0; i < rasters.getWidth(); i++) {
-        	for(int j = 0; j < rasters.getHeight(); j++) {      
+        for(int i = 0; i < widthExt; i++) {
+        	for(int j = 0; j < heightExt; j++) {      
         		
-        		values[i+2][j+2] = rasters.getPixel(i, j)[0].floatValue();     		
+        		//values[i+2][j+2] = rasters.getPixel(i, j)[0].floatValue();  
+        		
+        		if(i > 1 && i < widthExt - 2){
+					x = i - 2;
+				}else {
+					x = Math.abs(width - Math.abs(i - 2));
+				}
+				
+				if(j > 1 && (j < heightExt - 2)) {
+					y = j - 2;
+				}
+				else {
+					y = Math.abs(height - Math.abs(j - 2));
+				}
+				
+				values[i][j] = rasters.getPixel(x, y)[0].doubleValue();
         		
         	}        	
-        }              
+        }  
         
+        // awful piece of code to extract scale and start params
         for(FileDirectoryEntry fileE: fileDirectory.getEntries()) {
         	
         	if(fileE.getFieldTag().toString().equals("ModelPixelScale")) { 	        		
@@ -58,7 +85,7 @@ public class GeoTiff {
         return new Location(loc1Coors[0],loc1Coors[1]);        
 	}
 	
-	public float getPxValue(int x, int y) {
+	public double getPxValue(int x, int y) {
 		return values[x+2][y+2];
 	}
 	
@@ -80,7 +107,22 @@ public class GeoTiff {
 		
 	}
 	
-	public double getAvgFromNeighborhood(int x, int y) 	{
+	public double getAvgFromNeighborhood(int[] point, double[] refPoly) 	{
+		
+		double[] coverages = new double[5*5];
+		int k = 0;
+		
+		for (int i = point[0] - 2; i < point[0] + 2; i++) {
+			for (int j = point[1] - 2; j < point[1] + 2; j++) {
+				
+				coverages[k] = GeoMethods.getArea(PolygonIntersect.getIntersect(refPoly, getPixelBoundaries(i,j)));
+			}
+			
+		}
+		//System.out.println(Arrays.toString(coverages));
+		System.out.println(GeoMethods.getArea(refPoly));
+		System.out.println(DoubleStream.of(coverages).sum());
+		System.out.println(DoubleStream.of(coverages).sum()/(GeoMethods.getArea(refPoly)/100));
 		return 0;
 		
 		

@@ -31,17 +31,19 @@ public class App
     	
     	
     	double[] biggerPoly = mammalsMap.get("29UPR4");
-    	double[] smallerPoly = avgTempJan.getPixelBoundaries(1042, 240); 	    	
+    	//double[] smallerPoly = avgTempJan.getPixelBoundaries(1042, 240); 	    	
     	System.out.println("Coordinates of area 29UPR4 " + Arrays.toString(biggerPoly));
-    	System.out.println("Boundaries of pixel " + Arrays.toString(smallerPoly)); 
+    	//System.out.println("Boundaries of pixel " + Arrays.toString(smallerPoly)); 
     	
     	Location middleLocation = GeoMethods.middleCoorOfPolygon(biggerPoly);
     	System.out.println("Middle coors: " + middleLocation);  
     	int[] middlePixel = avgTempJan.coorsToPixel(middleLocation);
+    	System.out.println(Arrays.toString(middlePixel));
+    	System.out.println(avgTempJan.getAvgFromNeighborhood(new int[] {1041,240}, biggerPoly));
     	
     	
     	//System.out.println(Arrays.toString(PolygonIntersect.getIntersect(biggerPoly, smallerPoly)));
-    	System.out.println(GeoMethods.getArea((PolygonIntersect.getIntersect(biggerPoly, smallerPoly))));
+    	//System.out.println(GeoMethods.getArea((PolygonIntersect.getIntersect(biggerPoly, smallerPoly))));
     	
     	//PolygonIntersect.getIntersect(refPoly, incPoly);
     	/*
@@ -66,24 +68,43 @@ public class App
     	
     	System.out.println(GeoMethods.getArea(mammalsMap.get("29UPR4")));
     	 */
+    	/*
+    	int lenFirst = 4;    	
+    	double[][] puvodni = new double[lenFirst][lenFirst];
     	
-    	int length = 8;
-		double[][] pole = new double[length][length];
+    	int lengthExt = 8;
+		double[][] pole = new double[lengthExt][lengthExt];
 		
-		for(int i = 2; i < length - 2;i++) {
-			for(int j = 2; j <length - 2;j++) {
-				
-				pole[i][j] = ThreadLocalRandom.current().nextInt(2, 9+ 1);
-				
+		for(int i = 0; i < lenFirst;i++) {
+			for(int j = 0; j <lenFirst;j++) {				
+				puvodni[i][j] = ThreadLocalRandom.current().nextInt(3, 9+ 1);				
 			}
 		}
-		for(int i = 0; i < length;i++) {
-			for(int j = 0; j < length;j++) {
-				if((i > 1 && i < length-2) && (j > 1 && (j < length - 2))) {
-					continue;
-				}
-				pole[i][j] = 1;
+		
+		System.out.println(Arrays.toString(puvodni[0]));
+		System.out.println(Arrays.toString(puvodni[1]));
+		System.out.println(Arrays.toString(puvodni[2]));
+		System.out.println(Arrays.toString(puvodni[3]));
+		int x = 0;
+		int y = 0;
+		
+		for(int i = 0; i < lengthExt;i++) {
+			for(int j = 0; j < lengthExt;j++) {
 				
+				if(i > 1 && i < lengthExt - 2){
+					x = i - 2;
+				}else {
+					x = Math.abs(lenFirst - Math.abs(i - 2));
+				}
+				
+				if(j > 1 && (j < lengthExt - 2)) {
+					y = j - 2;
+				}
+				else {
+					y = Math.abs(lenFirst - Math.abs(j - 2));
+				}
+				
+				pole[i][j] = puvodni[x][y];
 			}
 			
 		}
@@ -97,7 +118,7 @@ public class App
 		System.out.println(Arrays.toString(pole[6]));
 		System.out.println(Arrays.toString(pole[7]));
 		
-		
+		*/
     	
     	
     	
