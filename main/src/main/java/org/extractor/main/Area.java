@@ -5,13 +5,41 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class PolygonIntersect {
+public class Area {
 
 	
-	public static double[] getIntersect(double[] reference, double[] incident) {
+	private final double[] GPSCoordinates;
+	
+	public Area(double[] coors) {
 		
-		List<double[]> linesReference = getLines(reference);
-		List<double[]> linesIncident = getLines(incident);
+		this.GPSCoordinates = coors;		
+	}
+	
+	public Location getMiddleCoordinate() {
+		
+		double height = GPSCoordinates[1] + GPSCoordinates[3];
+		double width = GPSCoordinates[0] + GPSCoordinates[4];
+		
+		return new Location(width/2,height/2);
+		
+	}
+
+	public double getArea() {
+		double area = 0;
+	
+		for(int i = 0; i < GPSCoordinates.length-2; i += 2) {
+			area += (GPSCoordinates[i] * GPSCoordinates[i + 3])
+					- (GPSCoordinates[i + 1] * GPSCoordinates[i + 2]); 
+		
+		}
+	
+		return Math.abs(area/2);
+	}
+	
+	public Area intersection(Area incident) {
+		
+		List<double[]> linesReference = getLines(getGPSCoordinates());
+		List<double[]> linesIncident = getLines(incident.getGPSCoordinates());
 		
 		double[] point1 = new double[2];
 		double[] point2 = new double[2];
@@ -59,11 +87,11 @@ public class PolygonIntersect {
 			polygon[k] = linesIncident.get(0)[1];			
 		}
 		
-		return polygon;
+		return new Area(polygon);
 	}
 	
 	
-	public static List<double[]> getLines(double[] polygon) {
+	private List<double[]> getLines(double[] polygon) {
 		List<double[]> lines = new ArrayList<>();
 		for(int i = 0; i < polygon.length-2;i+=2) {
 			lines.add(new double[] {polygon[i], polygon[i+1], polygon[i+2], polygon[i+3]});			
@@ -71,7 +99,7 @@ public class PolygonIntersect {
 		return lines;
 	}
 	
-	public static List<double[]> getLines(List<double[]> pointList) {
+	private List<double[]> getLines(List<double[]> pointList) {
 		
 		double[] polygon = new double[pointList.size() *2 + 2];
 		int k = 0;
@@ -92,7 +120,7 @@ public class PolygonIntersect {
 		return getLines(polygon);
 	}
 	
-	public static boolean isFront(double[] line, double[] point) {	
+	private boolean isFront(double[] line, double[] point) {	
 		
 		double result = ((line[3] - line[1]) * point[0] - (line[2] - line[0]) * point[1] + line[2] * line[1] - line[3]*line[0])/
 				Math.sqrt(Math.pow((line[3] - line[1]), 2) + Math.pow((line[2] - line[0]), 2));
@@ -100,7 +128,7 @@ public class PolygonIntersect {
 		return result >= 0;
 	}
 	
-	public static double[] intersection(double[] line, double[] p, double[] q) {
+	private double[] intersection(double[] line, double[] p, double[] q) {
 		double[] a = new double[] {line[0], line[1]};
 		double[] b = new double[] {line[2], line[3]};		
         double A1 = b[1] - a[1];
@@ -117,7 +145,13 @@ public class PolygonIntersect {
  
         return new double[]{x, y};
     }
-	
-	
-	
+
+	public double[] getGPSCoordinates() {
+		return GPSCoordinates;
+	}
+
+	@Override
+	public String toString() {
+		return "Area [GPSCoordinates=" + Arrays.toString(GPSCoordinates) + "]";
+	}
 }

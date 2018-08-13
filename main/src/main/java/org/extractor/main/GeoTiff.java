@@ -26,8 +26,10 @@ public class GeoTiff {
 		
 		File file = new File(path);       
         TIFFImage tiffImage = TiffReader.readTiff(file);        
-        FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);        
-        Rasters rasters = fileDirectory.readRasters();  
+        FileDirectory fileDirectory = tiffImage.getFileDirectories().get(0);
+        
+        Rasters rasters = fileDirectory.readRasters(); 
+        
         int width = rasters.getWidth();
         int height = rasters.getHeight();
         int widthExt = width + 4;
@@ -97,6 +99,7 @@ public class GeoTiff {
 			return coors;		
 	}
 	
+	
 	public int[] coorsToPixel(Location loc) {
 		int pixelCoors[] = new int[2];
 		pixelCoors[0] = (int) ((loc.getLongitude() - lonStart) / xScale);
@@ -107,30 +110,40 @@ public class GeoTiff {
 		
 	}
 	
-	public double getAvgFromNeighborhood(int[] point, double[] refPoly) 	{
-		
-		double[] coverages = new double[5*5];
+	public double getAvgFromNeighborhood(Area refPoly, int radius) 	{
+		int size = (radius * 2) + 1;		
+		int point[] = coorsToPixel(refPoly.getMiddleCoordinate());
+		double[] coverages = new double[size * size];
+		double[] values = new double[size * size];
+		//Area polyArea = new Area(refPoly);
+		double refPolyArea = refPoly.getArea();		
 		int k = 0;
 		
-		for (int i = point[0] - 2; i < point[0] + 2; i++) {
-			for (int j = point[1] - 2; j < point[1] + 2; j++) {
+		// coverage for each clima polygon with mammals polygon
+		// used for computing average value in mammal area
+		for (int i = point[0] - radius; i <= point[0] + radius; i++) {
+			for (int j = point[1] - radius; j <= point[1] + radius; j++) {									
+						
+				coverages[k] = refPoly.intersection(getPixelBoundaries(i,j)).getArea();
+				coverages[k] = coverages[k] / refPolyArea * 100;
 				
-				coverages[k] = GeoMethods.getArea(PolygonIntersect.getIntersect(refPoly, getPixelBoundaries(i,j)));
-			}
-			
-		}
-		//System.out.println(Arrays.toString(coverages));
-		System.out.println(GeoMethods.getArea(refPoly));
-		System.out.println(DoubleStream.of(coverages).sum());
-		System.out.println(DoubleStream.of(coverages).sum()/(GeoMethods.getArea(refPoly)/100));
-		return 0;
+				values[k] = getPxValue(i,j);;
+				if(values[k] == -3.3999999521443642E38) {
+					values[k] = 0;					
+					coverages[k] = 0;
+				}
+				values[k] = values[k] * coverages[k];				
+				
+				k++;
+				}			
+		}		
 		
-		
-	
+		return DoubleStream.of(values).sum() / DoubleStream.of(coverages).sum();
 	}
 	
 	// returns ale GPS coordinates bound pixel
-	public double[] getPixelBoundaries(int x, int y) {
+	
+	public Area getPixelBoundaries(int x, int y) {
 		
 		double[] boundaries = new double[10];	
 		int k = 0;
@@ -157,8 +170,9 @@ public class GeoTiff {
 		boundaries[8] = boundaries[0];
 		boundaries[9] = boundaries[1];
 		
-		return boundaries;		
+		return new Area(boundaries);		
 	}
+	
 	
 	
 	
