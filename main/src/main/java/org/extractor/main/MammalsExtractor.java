@@ -1,114 +1,112 @@
 package org.extractor.main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+public class MammalsExtractor {
 
-
-
-public class MammalsExtractor {	
+	private final String urlToMap;
+	private final String urlToSpecies;
 	
-	private String url = "https://www.european-mammals.org/osm/EMMA2grid.php";
-	private String storageFileFullName = "mammals/CGRSJSON.txt";
-	private JSONObject cgrsJson;
 	
-	public MammalsExtractor()  {
-		
-		File file = new File(storageFileFullName);
-		
+	
+	public MammalsExtractor() {
+		this.urlToMap = "https://www.european-mammals.org/php/rendermap.php?latname=";
+		this.urlToSpecies = "https://www.european-mammals.org/php/mapmaker.php";
+		//System.out.println(downloadWebPage(this.urlToMap + getSpecies().get(0)));
+		//getMammalsPresence();
+		//;
+			
+	}
+	
+	private String downloadWebPage(String targetURL) {
+		StringBuilder pageBuilder = new StringBuilder();
 		try {
-			if(file.exists()) {			
-				cgrsJson = readJSONFromFile(file.getPath());
+			URL url = new URL(targetURL);
+		    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		    //BufferedWriter writer = new BufferedWriter(new FileWriter("data.html"));		    
+		    String line;
+		    
+		    while ((line = reader.readLine()) != null) {
+		    	pageBuilder.append(line);		       
+		    }
+		    reader.close();
+		    
+		}catch(Exception e1) {
+			System.out.println("nepovedlo se");
+		}  
+		
+		return pageBuilder.toString();
+	}
+	
+	public List<String> getSpecies() {		
+		StringBuilder strBuilder = new StringBuilder(downloadWebPage(this.urlToSpecies));
+		String startTag = "<OPTION >";
+		String endTag = "</OPTION>";
+		int startIndex;
+		int endIndex;
+		List<String> species = new ArrayList<>();
+		
+		while(strBuilder.indexOf(startTag) != -1) {			
+			startIndex = strBuilder.indexOf(startTag) + 9;
+			endIndex = strBuilder.indexOf(endTag);			
+			species.add(strBuilder.substring(startIndex, endIndex).replace(" ", "+"));			
+			strBuilder.delete(0,endIndex + 9);
 			
-			}else {			
-				cgrsJson = readJSONFromUrl(url);
-				writeJSONToFile(cgrsJson,file.getPath());				
+		}	    
+	    return species;
+	}
+	
+	private Mammal extractMammal(String mammalName) {
+		// extraction datapoints from HTML
+		StringBuilder strBuilder = new StringBuilder(downloadWebPage(this.urlToMap + mammalName));
+		List<String> postLocations = new ArrayList<>();
+		List<String> preLocations = new ArrayList<>();
+		strBuilder.delete(0, strBuilder.indexOf("datapoints"));
+		strBuilder.delete(0, strBuilder.indexOf("<use"));
+		strBuilder.delete(strBuilder.indexOf("</g>")-1, strBuilder.length()-1);
+				
+		//parse dataPoints
+		while(strBuilder.indexOf("id") != -1) {
+			int startIndex = strBuilder.indexOf("id");
+			int endIndex = strBuilder.indexOf("x");
+			String id;
+			String phase;				
+			id = strBuilder.substring(startIndex+6,endIndex-2);
+			startIndex = strBuilder.indexOf("#");
+			endIndex = strBuilder.indexOf("/>");
+		
+			phase = strBuilder.substring(startIndex,endIndex);
+			strBuilder.delete(0, endIndex+2);
+			if(phase.contains("post")) {
+				postLocations.add(id);
+			}else {
+				preLocations.add(id);
 			}
-		}catch(IOException e1) {
-				System.out.println("IO Error");		
-		}catch(JSONException e2) {
-			System.out.println("JSON Error");
-		}	
-	}
-	
-	
-	
-	private JSONObject readJSONFromUrl(String url){
-		JSONObject json = new JSONObject();
-        try {
-          InputStream is= new URL(url).openStream();
-          BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-          String jsonText = rd.lines().collect(Collectors.joining());           
-          json = new JSONObject(jsonText);          
-          is.close();          
-        } catch(Exception e) {
-          
-        }
-		return json;
-      }
-	
-	private void writeJSONToFile(JSONObject obj, String path) {
 		
-		try (FileWriter file = new FileWriter(path)) {
-			file.write(obj.toString());			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private JSONObject readJSONFromFile(String url) throws FileNotFoundException {
-		
-		BufferedReader rd = new BufferedReader(new FileReader(url));
-		String jsonText = rd.lines().collect(Collectors.joining());          
-        JSONObject json = new JSONObject(jsonText);
-        return json;
-	}
-	
-	public  HashMap<String, double[]> getAreas() throws JSONException, IOException{
-		
-		JSONArray jsonArray = new JSONArray(cgrsJson.get("features").toString());
-		HashMap<String,double[]> cgrsCoordinates = new HashMap<>();
-		
-		for(int i = 0; i < jsonArray.length(); i++) {
-			
-			JSONObject cgrsCellJson = ((JSONObject) jsonArray.get(i));
-	    	JSONObject geometry = ((JSONObject) cgrsCellJson.get("geometry"));
-	    	JSONObject properties = (JSONObject) cgrsCellJson.get("properties");   	
-	    	
-	    	String[] coorsList = geometry.get("coordinates").toString()
-	    			.replace("[", "").replace("]", "").split(",");
-	    	
-	    	double[] doubleCoors = new double[coorsList.length];
-	    	
-	    	for(int j =0; j < coorsList.length; j++) {
-	    		doubleCoors[j] = Double.parseDouble(coorsList[j]);    		
-	    	}
-	    	
-	    	cgrsCoordinates.put(properties.getString("CGRSName"), doubleCoors);   	
-			
 		}
 		
-    	return cgrsCoordinates;
-		
+		return new Mammal(mammalName, preLocations, postLocations);
+	}
+	
+	public List<Mammal> getMammalsPresence() {
+		return getSpecies().stream()
+				.map(s -> extractMammal(s))
+				.collect(Collectors.toList());		
 	}
 	
 	
-	
-		
 }

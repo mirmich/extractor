@@ -21,9 +21,10 @@ public class App
     	 
     	// HashMap stores data from european mammals, cgrs cells with coors
     	GeoTiff avgTempJan = new GeoTiff("world/wc2.0_10m_tavg_01.tif");
+    	MammalsMapExtractor mMapExtractor = new MammalsMapExtractor();
     	MammalsExtractor mExtractor = new MammalsExtractor();
     	
-    	HashMap<String,double[]> mammalsMap = mExtractor.getAreas();
+    	HashMap<String,double[]> mammalsMap = mMapExtractor.getAreas();
     	    	
     	double[] biggerPoly = mammalsMap.get("29UPR4");
     	MammalArea mArea = new MammalArea("29UPR4",biggerPoly);
